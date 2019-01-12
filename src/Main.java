@@ -55,40 +55,114 @@ public class Main {
             if (mod == 9) {
                 if (tab[linha][pos].getValor() > tab[linha][pos - 1].getValor()) {
                     res[linha] = tab[linha][pos];
-                    int j = linha++;
-                    encontraCaminhoGuloso(tab, res, pos, linha++);
+                    int j = linha + 1;
+                    encontraCaminhoGuloso(tab, res, pos, j);
                 } else {
                     res[linha] = tab[linha][pos - 1];
-                    int j = linha++;
-                    encontraCaminhoGuloso(tab, res, pos - 1, linha++);
+                    int j = linha + 1;
+                    encontraCaminhoGuloso(tab, res, pos - 1, j);
                 }
             }
             else{
                 if (mod == 0) {
                     if (tab[linha][pos].getValor() > tab[linha][pos + 1].getValor()) {
                         res[linha] = tab[linha][pos];
-                        int j = linha++;
-                        encontraCaminhoGuloso(tab, res, pos, linha++);
+                        int j = linha + 1;
+                        encontraCaminhoGuloso(tab, res, pos, j);
                     } else {
                         res[linha] = tab[linha][pos + 1];
-                        int j = linha++;
-                        encontraCaminhoGuloso(tab, res, pos + 1, linha++);
+                        int j = linha + 1;
+                        encontraCaminhoGuloso(tab, res, pos + 1, j);
                     }
                 } else{
                     if (tab[linha][pos].getValor() > tab[linha][pos - 1].getValor() && tab[linha][pos].getValor() > tab[linha][pos + 1].getValor()) {
                         res[linha] = tab[linha][pos];
-                        int j = linha++;
-                        encontraCaminhoGuloso(tab, res, pos, linha++);
+                        int j = linha + 1;
+                        encontraCaminhoGuloso(tab, res, pos, j);
                     } else {
                         if (tab[linha][pos + 1].getValor() > tab[linha][pos - 1].getValor() && tab[linha][pos + 1].getValor() > tab[linha][pos].getValor()) {
                             res[linha] = tab[linha][pos + 1];
-                            int j = linha++;
-                            encontraCaminhoGuloso(tab, res, pos + 1, linha++);
+                            int j = linha + 1;
+                            encontraCaminhoGuloso(tab, res, pos + 1, j);
                         } else {
                             res[linha] = tab[linha][pos - 1];
-                            int j = linha++;
-                            encontraCaminhoGuloso(tab, res, pos - 1, linha++);
+                            int j = linha + 1;
+                            encontraCaminhoGuloso(tab, res, pos - 1, j);
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    private static int valorTotalAtual(NoTabuleiro[] res){
+        if (res[1] == null){
+            return -99999;
+        }
+        int total = 0;
+        for (NoTabuleiro no: res) {
+            total += no.getValor();
+        }
+        return total;
+    }
+
+    private static void damasDinamico(NoTabuleiro[][] tab, NoTabuleiro[] res){
+        int j = 0;
+        for (int i = 1; i < res.length; i++){
+            if (tab[0][i].getValor() >= tab[0][j].getValor()){
+                res[0] = tab[0][i];
+                j = i;
+            }
+        }
+        NoTabuleiro[] temporario = new NoTabuleiro[res.length];
+        temporario[0] = res[0];
+        encontrarCaminhoDinamico(tab, res, temporario, res[0].getValor(), 1, j);
+
+    }
+
+    //FALTA CORRIGIR A FALHA DO VALOR FICAR PRESO QUANDO ENTRA NO CANTO!!
+    private static void encontrarCaminhoDinamico(NoTabuleiro[][] tab, NoTabuleiro[] res, NoTabuleiro[] temp, int valorAtual, int linha, int pos){
+        if(linha > res.length - 1){
+            if (valorAtual > valorTotalAtual(res)){
+                for (int i = 0;i < res.length; i++){
+                    res[i] = temp[i];
+                }
+            }
+        } else{
+            int mod = pos % res.length;
+            if (mod == res.length - 1){
+                int j = linha;
+                int novoAtual = valorAtual;
+                for(int i = pos - 1; i < pos + 1; i++){
+                    temp[j] = tab[j][i];
+                    novoAtual += tab[j][i].getValor();
+                    j++;
+                    encontrarCaminhoDinamico(tab, res, temp, novoAtual, j, i);
+                    j--;
+                    novoAtual -= tab[j][i].getValor();
+                }
+            } else {
+                if (mod == 0){
+                    int j = linha;
+                    int novoAtual = valorAtual;
+                    for(int i = pos; i < pos + 2; i++){
+                        temp[j] = tab[j][i];
+                        novoAtual += tab[j][i].getValor();
+                        j++;
+                        encontrarCaminhoDinamico(tab, res, temp, novoAtual, j, i);
+                        j--;
+                        novoAtual -= tab[j][i].getValor();
+                    }
+                } else{
+                    int j = linha;
+                    int novoAtual = valorAtual;
+                    for(int i = pos - 1; i <= pos + 1; i++){
+                        temp[j] = tab[j][i];
+                        novoAtual += tab[j][i].getValor();
+                        j++;
+                        encontrarCaminhoDinamico(tab, res, temp, novoAtual, j, i);
+                        j--;
+                        novoAtual -= tab[j][i].getValor();
                     }
                 }
             }
@@ -105,10 +179,9 @@ public class Main {
         preencherMatriz(10, gerador, tab);
         printarMatriz(tab);
         NoTabuleiro[] res = new NoTabuleiro[10];
-        System.out.println(res.length);
-        damasGuloso(tab, res);
+        damasDinamico(tab, res);
         System.out.println("Resultado: ");
-        for (int i = 0; i < 10; i++){
+        for (int i = 0; i < res.length; i++){
             System.out.print(res[i].getValor() + ", ");
         }
 
