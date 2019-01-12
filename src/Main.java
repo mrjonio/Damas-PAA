@@ -120,49 +120,49 @@ public class Main {
 
     }
 
-    //FALTA CORRIGIR A FALHA DO VALOR FICAR PRESO QUANDO ENTRA NO CANTO!!
     private static void encontrarCaminhoDinamico(NoTabuleiro[][] tab, NoTabuleiro[] res, NoTabuleiro[] temp, int valorAtual, int linha, int pos){
         if(linha > res.length - 1){
             if (valorAtual > valorTotalAtual(res)){
-                for (int i = 0;i < res.length; i++){
-                    res[i] = temp[i];
-                }
+                System.arraycopy(temp, 0, res, 0, res.length);
             }
         } else{
             int mod = pos % res.length;
             if (mod == res.length - 1){
                 int j = linha;
                 int novoAtual = valorAtual;
+                int copia = novoAtual;
                 for(int i = pos - 1; i < pos + 1; i++){
                     temp[j] = tab[j][i];
                     novoAtual += tab[j][i].getValor();
                     j++;
                     encontrarCaminhoDinamico(tab, res, temp, novoAtual, j, i);
                     j--;
-                    novoAtual -= tab[j][i].getValor();
+                    novoAtual = copia;
                 }
             } else {
                 if (mod == 0){
                     int j = linha;
                     int novoAtual = valorAtual;
+                    int copia = novoAtual;
                     for(int i = pos; i < pos + 2; i++){
                         temp[j] = tab[j][i];
                         novoAtual += tab[j][i].getValor();
                         j++;
                         encontrarCaminhoDinamico(tab, res, temp, novoAtual, j, i);
                         j--;
-                        novoAtual -= tab[j][i].getValor();
+                        novoAtual = copia;
                     }
                 } else{
                     int j = linha;
                     int novoAtual = valorAtual;
+                    int copia = novoAtual;
                     for(int i = pos - 1; i <= pos + 1; i++){
                         temp[j] = tab[j][i];
                         novoAtual += tab[j][i].getValor();
                         j++;
                         encontrarCaminhoDinamico(tab, res, temp, novoAtual, j, i);
                         j--;
-                        novoAtual -= tab[j][i].getValor();
+                        novoAtual = copia;
                     }
                 }
             }
@@ -181,8 +181,8 @@ public class Main {
         NoTabuleiro[] res = new NoTabuleiro[10];
         damasDinamico(tab, res);
         System.out.println("Resultado: ");
-        for (int i = 0; i < res.length; i++){
-            System.out.print(res[i].getValor() + ", ");
+        for (NoTabuleiro re : res) {
+            System.out.print(re.getValor() + ", ");
         }
 
 
